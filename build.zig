@@ -43,7 +43,7 @@ pub fn build(b: *std.Build) void {
             config_header.addValues(.{
                 .HAVE_DECL_SYS_SIGLIST = 1,
             });
-            exe.defineCMacro("SYS_SIGLIST_DECLARED", "1");
+            exe.root_module.addCMacro("SYS_SIGLIST_DECLARED", "1");
         } else {
             config_header.addValues(.{
                 .HAVE_DECL_SYS_SIGLIST = 0,
@@ -51,21 +51,21 @@ pub fn build(b: *std.Build) void {
         }
 
         if (target.result.os.tag == .windows) {
-            exe.defineCMacro("_POSIX_", "1");
-            exe.defineCMacro("putenv", "_putenv");
-            exe.defineCMacro("getpid", "_getpid");
-            exe.defineCMacro("fdopen", "_fdopen");
-            exe.defineCMacro("environ", "(*__p__environ())");
+            exe.root_module.addCMacro("_POSIX_", "1");
+            exe.root_module.addCMacro("putenv", "_putenv");
+            exe.root_module.addCMacro("getpid", "_getpid");
+            exe.root_module.addCMacro("fdopen", "_fdopen");
+            exe.root_module.addCMacro("environ", "(*__p__environ())");
         } else {
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            exe.defineCMacro("LOCALEDIR", "\".\"");
+            exe.root_module.addCMacro("LOCALEDIR", "\".\"");
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            exe.defineCMacro("LIBDIR", "\"lib\"");
+            exe.root_module.addCMacro("LIBDIR", "\"lib\"");
         }
         if (target.result.isGnuLibC()) {
             // TODO: only do this if we are compiling against gnu
-            //exe.defineCMacro("__USE_GNU", "1");
-            exe.defineCMacro("_GNU_SOURCE", "1");
+            //exe.root_module.addCMacro("__USE_GNU", "1");
+            exe.root_module.addCMacro("_GNU_SOURCE", "1");
         }
         const write_files = b.addWriteFiles();
         _ = write_files.addCopyFile(b.path("mkcustom.h"), "src/mkcustom.h");
@@ -170,7 +170,7 @@ fn linkGlob(
 
     const write_files = b.addWriteFiles();
     _ = write_files.addCopyFile(make_dep.path("src/config.h.W32"), "src/config.h");
-    lib.defineCMacro("HAVE_CONFIG_H", "1");
+    lib.root_module.addCMacro("HAVE_CONFIG_H", "1");
     lib.addIncludePath(make_dep.path("src"));
     lib.addIncludePath(make_dep.path("lib"));
     lib.addIncludePath(write_files.getDirectory().path(b, "src"));
