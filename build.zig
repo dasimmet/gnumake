@@ -123,7 +123,7 @@ pub fn build(b: *std.Build) void {
 }
 
 fn target_has_sys_siglist(t: std.Build.ResolvedTarget) bool {
-    if (t.result.isDarwin()) return true;
+    if (t.result.os.tag.isDarwin()) return true;
     if (t.result.isGnuLibC()) {
         const vr = t.result.os.versionRange();
         // newer glibc does not allow linking with sys_siglist
